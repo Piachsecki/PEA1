@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 
-public class Config {
+public class ConfigurationMapper {
     private String mode;
     private String filepath;
     private long iterations;
@@ -16,9 +16,9 @@ public class Config {
     private long startingPoint;
     private long randomIterationsValue;
     private boolean showProgress;
-    private List<Integer> matrixSizes;
+    private List<Long> matrixSizes;
 
-    public Config(String url) throws IOException, ParseException {
+    public ConfigurationMapper(String url) throws IOException, ParseException {
 
         Object obj = new JSONParser().parse(new FileReader(url));
 
@@ -32,13 +32,13 @@ public class Config {
             this.iterations = (Long) test.get("iterations"); // iterations jako Integer
             this.startingPoint = (Long) test.get("startingPoint"); // startingPoint jako Integer
             this.randomIterationsValue = (Long) test.get("randomIterationsValue"); // randomIterationsValue jako Integer
-            this.matrixType = (String) test.get("matrixType"); // matrixType jako String
+//            this.matrixType = (String) test.get("matrixType"); // matrixType jako String
             this.showProgress = (Boolean) test.get("showProgress");
 
         } else if ("simulation".equals(mode)) {
             Map simulation = (Map) jo.get("simulation");
 
-            this.matrixSizes = (List<Integer>) simulation.get("matrixSizes"); // iterations jako Integer
+            this.matrixSizes = (List<Long>) simulation.get("matrixSizes"); // iterations jako Integer
             this.iterations = (Long) simulation.get("iterations"); // iterations jako Integer
             this.startingPoint = (Long) simulation.get("startingPoint"); // startingPoint jako Integer
             this.randomIterationsValue = (Long) simulation.get("randomIterationsValue"); // randomIterationsValue jako Integer
@@ -106,11 +106,11 @@ public class Config {
         this.showProgress = showProgress;
     }
 
-    public List<Integer> getMatrixSizes() {
+    public List<Long> getMatrixSizes() {
         return matrixSizes;
     }
 
-    public void setMatrixSizes(List<Integer> matrixSizes) {
+    public void setMatrixSizes(List<Long> matrixSizes) {
         this.matrixSizes = matrixSizes;
     }
 }

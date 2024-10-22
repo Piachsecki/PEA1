@@ -1,0 +1,18 @@
+{
+  "mode": "test",
+  "test": {
+    "filepath": "C:\\Users\\krpia\\Desktop\\PEA1\\src\\resources\\matrix_6x6.atsp",
+    "iterations": 100,
+    "startingPoint": 0,
+    "randomIterationsValue": 1000,
+    "showProgress": false
+  },
+  "simulation": {
+    "matrixSizes": [12],
+    "iterations": 100,
+    "startingPoint": 0,
+    "randomIterationsValue": 1000,
+    "matrixType": "nosymetric",
+    "showProgress": false
+  }
+}

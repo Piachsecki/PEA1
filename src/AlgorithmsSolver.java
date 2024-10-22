@@ -2,49 +2,47 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class ProblemSolver {
+public class AlgorithmsSolver {
     private Matrix matrix;
-    private Config configClass;  // Zmienna przechowująca konfigurację
+    private ConfigurationMapper configurationMapperClass;  // Zmienna przechowująca konfigurację
 
     // Konstruktor przyjmujący macierz i obiekt konfiguracji
-    public ProblemSolver(Matrix matrix, Config configClass) {
+    public AlgorithmsSolver(Matrix matrix, ConfigurationMapper configurationMapperClass) {
         this.matrix = matrix;
-        this.configClass = configClass;
+        this.configurationMapperClass = configurationMapperClass;
     }
 
     // Getter i setter dla obiektu konfiguracji
-    public Config getConfigClass() {
-        return configClass;
+    public ConfigurationMapper getConfigClass() {
+        return configurationMapperClass;
     }
 
-    public ProblemSolver() {
+    public AlgorithmsSolver() {
     }
 
-    public void setConfigClass(Config configClass) {
-        this.configClass = configClass;
+    public void setConfigClass(ConfigurationMapper configurationMapperClass) {
+        this.configurationMapperClass = configurationMapperClass;
     }
 
-    // Przegląd zupełny - brute force
-//    public int solveBruteForce() {
-//        List<Integer> cities = generateInitialPath();
-//        int bestCost = Integer.MAX_VALUE;
-//        boolean showProgress = configClass.isShowProgress();  // Pobranie wartości showProgress z konfiguracji
-//
-//        // Generujemy wszystkie permutacje
-//        for (List<Integer> perm : generatePermutations(cities)) {
-//            int currentCost = calculatePathCost(perm);
-//            if (currentCost < bestCost) {
-//                bestCost = currentCost;
-//            }
-//
-//            // Jeśli showProgress jest włączone, wyświetl postęp
-//            if (showProgress) {
-//                System.out.println("Current path: " + perm + " | Cost: " + currentCost);
-//            }
-//        }
-//
-//        return bestCost;
-//    }
+    //     Przegląd zupełny - brute force
+    public int solveBruteForce() {
+        List<Integer> cities = generateInitialPath();
+        int bestCost = Integer.MAX_VALUE;
+        boolean showProgress = configurationMapperClass.isShowProgress();
+
+        for (List<Integer> perm : generatePermutations(cities)) {
+            int currentCost = calculatePathCost(perm);
+            if (currentCost < bestCost) {
+                bestCost = currentCost;
+            }
+
+            if (showProgress) {
+                System.out.println("Current path: " + perm + " | Cost: " + currentCost);
+            }
+        }
+
+        return bestCost;
+    }
 
     public Matrix getMatrix() {
         return matrix;
@@ -56,8 +54,8 @@ public class ProblemSolver {
 
     // Algorytm najbliższego sąsiada
     public int solveNearestNeighbor() {
-        int startingPoint = (int) configClass.getStartingPoint();  // Rzutowanie long na int
-        boolean showProgress = configClass.isShowProgress();  // Pobranie showProgress z konfiguracji
+        int startingPoint = (int) configurationMapperClass.getStartingPoint();
+        boolean showProgress = configurationMapperClass.isShowProgress();
         List<Integer> path = new ArrayList<>();
         List<Integer> unvisited = generateInitialPath();
         path.add(startingPoint);
@@ -69,21 +67,19 @@ public class ProblemSolver {
             path.add(nearestCity);
             unvisited.remove(Integer.valueOf(nearestCity));
 
-            // Jeśli showProgress jest włączone, wyświetl postęp
             if (showProgress) {
                 System.out.println("Added city: " + nearestCity + " | Current path: " + path);
             }
         }
 
-        // Oblicz koszt znalezionej ścieżki
         return calculatePathCost(path);
     }
 
     // Algorytm losowy
     public int solveRandom() {
         int bestCost = Integer.MAX_VALUE;
-        int iterations = (int) configClass.getRandomIterationsValue();  // Pobranie liczby iteracji z konfiguracji
-        boolean showProgress = configClass.isShowProgress();  // Pobranie showProgress
+        int iterations = (int) configurationMapperClass.getRandomIterationsValue();
+        boolean showProgress = configurationMapperClass.isShowProgress();
 
         for (int i = 0; i < iterations; i++) {
             List<Integer> path = generateInitialPath();
@@ -94,7 +90,6 @@ public class ProblemSolver {
                 bestCost = currentCost;
             }
 
-            // Jeśli showProgress jest włączone, wyświetl postęp
             if (showProgress) {
                 System.out.println("Iteration: " + (i + 1) + " | Current path: " + path + " | Cost: " + currentCost);
             }
