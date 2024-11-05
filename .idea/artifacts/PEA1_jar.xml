@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="PEA1:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/PEA1_jar</output-path>
+    <root id="archive" name="PEA1.jar">
+      <element id="module-output" name="PEA1" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/src/resources/json-simple-1.1.jar/json-simple-1.1.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
