@@ -14,9 +14,11 @@ public class DataGenerator {
     }
 
     // Metoda generująca macierz i przypisująca ją do pola matrix
-    public void generateMatrix(int size) {
+    public void generateMatrix(int size, String matrixType) {
         matrix = new int[size][size];
-        boolean isSymmetric = "symetric".equals(configMapper.getMatrixType());
+        boolean isSymmetric = "symetric".equals(matrixType);
+
+
 
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {

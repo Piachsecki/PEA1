@@ -1,30 +1,28 @@
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Stack;
+import java.util.PriorityQueue;
 
-public class DFS_TSP {
+public class LOW_COST_TSP {
     private int[][] distanceMatrix; // Macierz odległości
     private int n; // Liczba miast
     private int startingPoint; // Punkt startowy
 
-    public DFS_TSP(int[][] matrix, int startingPoint) {
+    public LOW_COST_TSP(int[][] matrix, int startingPoint) {
         this.distanceMatrix = matrix;
         this.n = matrix.length;
         this.startingPoint = startingPoint;
     }
 
-    public DFS_TSP() {
-    }
-
-    public int dfs() {
+    public int lc() {
         int minCost = Integer.MAX_VALUE;
 
-        Stack<State> stack = new Stack<>();
-        stack.push(new State(new ArrayList<>(Collections.singletonList(startingPoint)), 0, new boolean[n]));
+        // Kolejka priorytetowa przechowuje stan (sciezke, koszt i odwiedzone miasta)
+        PriorityQueue<State> pq = new PriorityQueue<>((a, b) -> Integer.compare(a.cost, b.cost));
+        pq.offer(new State(new ArrayList<>(Collections.singletonList(startingPoint)), 0, new boolean[n]));
 
-        while (!stack.isEmpty()) {
-            State current = stack.pop();
+        while (!pq.isEmpty()) {
+            State current = pq.poll();
             List<Integer> path = current.path;
             int currentCost = current.cost;
             boolean[] visited = current.visited;
@@ -49,7 +47,7 @@ public class DFS_TSP {
                         boolean[] newVisited = visited.clone();
                         newVisited[i] = true;
 
-                        stack.push(new State(newPath, currentCost + distanceMatrix[lastCity][i], newVisited));
+                        pq.offer(new State(newPath, currentCost + distanceMatrix[lastCity][i], newVisited));
                     }
                 }
             }
@@ -58,7 +56,6 @@ public class DFS_TSP {
         return minCost;
     }
 
-    // Zmieniona funkcja calculateBound
     private int calculateBound(int[][] matrix, boolean[] visited) {
         int bound = 0;
 
@@ -84,6 +81,9 @@ public class DFS_TSP {
         }
 
         return bound;
+    }
+
+    public LOW_COST_TSP() {
     }
 
     public int[][] getDistanceMatrix() {
@@ -122,6 +122,4 @@ public class DFS_TSP {
             this.visited = visited;
         }
     }
-
-
 }

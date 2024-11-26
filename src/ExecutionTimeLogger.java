@@ -9,11 +9,11 @@ public class ExecutionTimeLogger {
         this.csvFile = csvFile;
     }
 
-    public void logExecutionTime(String algorithm, int iteration, long executionTime) {
+    public void logExecutionTime(String algorithm, int n, long executionTime) {
         try (PrintWriter writer = new PrintWriter(new FileWriter(csvFile, true))) {
             // Zapisz nagłówki kolumn, jeśli plik jest pusty
 //            writer.println("Algorithm,Iteration,ExecutionTime(nanoseconds)");
-            writer.println(algorithm + "," + iteration + "," + executionTime);
+            writer.println(algorithm + "," + n + "," + executionTime );
         } catch (IOException e) {
             e.printStackTrace();
         }
