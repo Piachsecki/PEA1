@@ -1,12 +1,8 @@
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-
+import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-
 
 public class ConfigurationMapper {
     private String mode;
@@ -18,36 +14,48 @@ public class ConfigurationMapper {
     private boolean showProgress;
     private List<Long> matrixSizes;
 
-    public ConfigurationMapper(String url) throws IOException, ParseException {
+    public ConfigurationMapper(String url) throws IOException {
+        this.matrixSizes = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(url))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] parts = line.split(":", 2); // Rozdziel klucz i wartość
+                if (parts.length != 2) continue;
+                String key = parts[0].trim();
+                String value = parts[1].trim();
 
-        Object obj = new JSONParser().parse(new FileReader(url));
-
-        JSONObject jo = (JSONObject) obj;
-        this.mode = (String) jo.get("mode");
-
-
-        if ("test".equals(mode)) {
-            Map test = (Map) jo.get("test");
-            this.filepath = (String) test.get("filepath");
-            this.iterations = (Long) test.get("iterations"); // iterations jako Integer
-            this.startingPoint = (Long) test.get("startingPoint"); // startingPoint jako Integer
-            this.randomIterationsValue = (Long) test.get("randomIterationsValue"); // randomIterationsValue jako Integer
-//            this.matrixType = (String) test.get("matrixType"); // matrixType jako String
-            this.showProgress = (Boolean) test.get("showProgress");
-
-        } else if ("simulation".equals(mode)) {
-            Map simulation = (Map) jo.get("simulation");
-
-            this.matrixSizes = (List<Long>) simulation.get("matrixSizes"); // iterations jako Integer
-            this.iterations = (Long) simulation.get("iterations"); // iterations jako Integer
-            this.startingPoint = (Long) simulation.get("startingPoint"); // startingPoint jako Integer
-            this.randomIterationsValue = (Long) simulation.get("randomIterationsValue"); // randomIterationsValue jako Integer
-            this.matrixType = (String) simulation.get("matrixType"); // matrixType jako String
-            this.showProgress = (Boolean) simulation.get("showProgress");
-        } else {
-            throw new RuntimeException("Wrong mode specified in json config file");
+                switch (key) {
+                    case "mode":
+                        this.mode = value;
+                        break;
+                    case "filepath":
+                        this.filepath = value;
+                        break;
+                    case "iterations":
+                        this.iterations = Long.parseLong(value);
+                        break;
+                    case "startingPoint":
+                        this.startingPoint = Long.parseLong(value);
+                        break;
+                    case "randomIterationsValue":
+                        this.randomIterationsValue = Long.parseLong(value);
+                        break;
+                    case "showProgress":
+                        this.showProgress = Boolean.parseBoolean(value);
+                        break;
+                    case "matrixType":
+                        this.matrixType = value;
+                        break;
+                    case "matrixSizes":
+                        for (String size : value.split(",")) {
+                            this.matrixSizes.add(Long.parseLong(size.trim()));
+                        }
+                        break;
+                    default:
+                        throw new IllegalArgumentException("Nieznany klucz w konfiguracji: " + key);
+                }
+            }
         }
-
     }
 
     public String getMode() {
@@ -78,6 +86,10 @@ public class ConfigurationMapper {
         return showProgress;
     }
 
+    public List<Long> getMatrixSizes() {
+        return matrixSizes;
+    }
+
     public void setMode(String mode) {
         this.mode = mode;
     }
@@ -104,10 +116,6 @@ public class ConfigurationMapper {
 
     public void setShowProgress(boolean showProgress) {
         this.showProgress = showProgress;
-    }
-
-    public List<Long> getMatrixSizes() {
-        return matrixSizes;
     }
 
     public void setMatrixSizes(List<Long> matrixSizes) {

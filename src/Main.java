@@ -8,7 +8,7 @@ public class Main {
     public static void main(String[] args) {
         try {
             // Wczytaj konfigurację
-            ConfigurationMapper configuration = new ConfigurationMapper("./src/config.json");
+            ConfigurationMapper configuration = new ConfigurationMapper("./src/config.txt");
             DataGenerator dataGenerator = new DataGenerator(configuration);
             // Utwórz logger do czasu wykonania
             String csvFile = "execution_times.csv";
@@ -112,7 +112,7 @@ public class Main {
                 throw new RuntimeException("Wrong mode");
             }
 
-        } catch (IOException | ParseException e) {
+        } catch (IOException e ) {
             e.printStackTrace();
         }
     }
