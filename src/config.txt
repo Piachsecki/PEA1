@@ -1,8 +1,4 @@
 mode:test
-filepath:./src/resources/matrix_6x6.atsp
-iterations:100
-startingPoint:0
-randomIterationsValue:1000
-showProgress:false
-matrixSizes:11
-matrixType:nosymetric
+filepath:./src/resources/ftv47.atsp
+stopTime:1
+coolingRate:0.99

@@ -1,121 +1,111 @@
-import org.json.simple.parser.ParseException;
-
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
+import java.util.Random;
 
 public class Main {
     public static void main(String[] args) {
         try {
-            // Wczytaj konfigurację
+            // Wczytanie konfiguracji z pliku
             ConfigurationMapper configuration = new ConfigurationMapper("./src/config.txt");
-            DataGenerator dataGenerator = new DataGenerator(configuration);
-            // Utwórz logger do czasu wykonania
-            String csvFile = "execution_times.csv";
-            ExecutionTimeLogger logger = new ExecutionTimeLogger(csvFile);
-            DFS_TSP dfsTsp = new DFS_TSP();
-            BFS_TSP bfsTsp = new BFS_TSP();
-            LOW_COST_TSP lowCostTsp = new LOW_COST_TSP();
 
-            // W zależności od trybu uruchom odpowiedni algorytm
-            if (configuration.getMode().equals("test")) {
-                // Wczytaj macierz z pliku
-                dataGenerator.readMatrixFromFile(configuration.getFilepath());
-                bfsTsp.setDistanceMatrix(dataGenerator.getMatrix());
-                bfsTsp.setStartingPoint((int) configuration.getStartingPoint());
-                bfsTsp.setN(dataGenerator.getMatrix().length - 1);
+            // Wczytanie macierzy odległości z pliku ATSP za pomocą DataParser
+            DataParser parser = new DataParser();
+            parser.parseFile(configuration.getFilepath());
+            int[][] distanceMatrix = parser.getDistanceMatrix();
+            parser.displayMatrix();
 
+            // Inicjalizacja parametrów algorytmu Symulowanego Wyżarzania
+            double initialTemperature = computeInitialTemperature(distanceMatrix, 0.8, 20);
+//            double initialTemperature = 250;
+            double coolingRate = configuration.getCoolingRate(); // Pobranie współczynnika zmiany temperatury z konfiguracji
+            long stopTime = configuration.getStopTime(); // Kryterium stopu (w sekundach)
 
-                lowCostTsp.setDistanceMatrix(dataGenerator.getMatrix());
-                lowCostTsp.setStartingPoint((int) configuration.getStartingPoint());
-                lowCostTsp.setN(dataGenerator.getMatrix().length - 1);
+            // Uruchomienie algorytmu Symulowanego Wyżarzania
+            SimulatedAnnealing sa = new SimulatedAnnealing(distanceMatrix, initialTemperature, coolingRate, stopTime);
+            int[] bestSolution = sa.run();
+            int bestCost = sa.calculateCost(bestSolution);
 
+            // Wyświetlenie wyników
+            System.out.println("Najlepsze znalezione rozwiązanie:");
+            System.out.println("Koszt: " + bestCost);
+            System.out.println("Ścieżka: " + Arrays.toString(bestSolution));
 
-                dfsTsp.setDistanceMatrix(dataGenerator.getMatrix());
-                dfsTsp.setStartingPoint((int) configuration.getStartingPoint());
-                dfsTsp.setN(dataGenerator.getMatrix().length - 1);
-
-
-                for (int i = 0; i < configuration.getIterations(); i++) {
-                    // BFS - pomiar czasu w mikrosekundach
-                    long start = System.nanoTime();
-                    int costBFS = bfsTsp.bfs(); // Zakładamy, że BFS_TSP ma metodę bfs()
-                    long end = System.nanoTime();
-                    long durationUsBFS = (end - start) / 1_000; // Konwersja na mikrosekundy
-                    logger.logExecutionTime("bfs", bfsTsp.getN() + 1, durationUsBFS);
-
-                    // DFS - pomiar czasu w mikrosekundach
-                    start = System.nanoTime();
-                    int costDFS = dfsTsp.dfs(); // Zakładamy, że DFS_TSP ma metodę dfs()
-                    end = System.nanoTime();
-                    long durationUsDFS = (end - start) / 1_000; // Konwersja na mikrosekundy
-                    logger.logExecutionTime("dfs",dfsTsp.getN() + 1, durationUsDFS);
-
-
-                    //lowcost
-                    start = System.nanoTime();
-                    int costLowCost = lowCostTsp.lc();
-                    end = System.nanoTime();
-                    long duriationUsLowCost = (end - start) / 1_000; // Konwersja na mikrosekundy
-                    logger.logExecutionTime("lc", lowCostTsp.getN() + 1, duriationUsLowCost);
-
-
-                }
-
-
-            } else if (configuration.getMode().equals("simulation")) {
-
-                for (int i = 0; i < configuration.getIterations(); i++) {
-
-                    dataGenerator.generateMatrix(configuration.getMatrixSizes().getFirst().intValue(), configuration.getMatrixType());
-
-                    bfsTsp.setDistanceMatrix(dataGenerator.getMatrix());
-                    bfsTsp.setStartingPoint((int) configuration.getStartingPoint());
-                    bfsTsp.setN(dataGenerator.getMatrix().length - 1);
-
-
-                    lowCostTsp.setDistanceMatrix(dataGenerator.getMatrix());
-                    lowCostTsp.setStartingPoint((int) configuration.getStartingPoint());
-                    lowCostTsp.setN(dataGenerator.getMatrix().length - 1);
-
-
-                    dfsTsp.setDistanceMatrix(dataGenerator.getMatrix());
-                    dfsTsp.setStartingPoint((int) configuration.getStartingPoint());
-                    dfsTsp.setN(dataGenerator.getMatrix().length - 1);
-
-
-                    // BFS - pomiar czasu w mikrosekundach
-                    long start = System.nanoTime();
-                    int costBFS = bfsTsp.bfs(); // Zakładamy, że BFS_TSP ma metodę bfs()
-                    long end = System.nanoTime();
-                    long durationUsBFS = (end - start) / 1_000; // Konwersja na mikrosekundy
-                    logger.logExecutionTime("bfs", bfsTsp.getN() + 1, durationUsBFS);
-
-//                     DFS - pomiar czasu w mikrosekundach
-                    start = System.nanoTime();
-                    int costDFS = dfsTsp.dfs(); // Zakładamy, że DFS_TSP ma metodę dfs()
-                    end = System.nanoTime();
-                    long durationUsDFS = (end - start) / 1_000; // Konwersja na mikrosekundy
-                    logger.logExecutionTime("dfs", dfsTsp.getN() + 1, durationUsDFS);
-
-
-//                    lowcost
-                    start = System.nanoTime();
-                    int costLowCost = lowCostTsp.lc(); // Zakładamy, że DFS_TSP ma metodę dfs()
-                    end = System.nanoTime();
-                    long duriationUsLowCost = (end - start) / 1_000; // Konwersja na mikrosekundy
-                    logger.logExecutionTime("lc", lowCostTsp.getN() + 1, duriationUsLowCost);
-
-                }
-
-            } else {
-                throw new RuntimeException("Wrong mode");
-            }
-
-        } catch (IOException e ) {
-            e.printStackTrace();
+            // Logowanie czasu wykonania (opcjonalne)
+            ExecutionTimeLogger logger = new ExecutionTimeLogger("execution_times.csv");
+            logger.logExecutionTime("SimulatedAnnealing", distanceMatrix.length, stopTime);
+        } catch (IOException e) {
+            System.err.println("Błąd podczas wczytywania pliku: " + e.getMessage());
+        } catch (Exception e) {
+            System.err.println("inny " + e.getMessage());
         }
     }
 
+    public static double computeInitialTemperature(int[][] costMatrix, double acceptanceProbability, int sampleSize) {
+        Random rand = new Random();
+        int n = costMatrix.length;
 
+        double sumDelta = 0.0;
+
+        // Wykonujemy "sampleSize" prób, aby uśrednić ΔE
+        for (int i = 0; i < sampleSize; i++) {
+            // (permutacja miast)
+            int[] route = generateRandomRoute(n, rand);
+            double cost1 = routeCost(route, costMatrix);
+
+            // 2. Stwórz sąsiada (np. przez zamianę dwóch miast w trasie)
+            int[] neighbor = route.clone();
+            swapTwoCities(neighbor, rand);
+            double cost2 = routeCost(neighbor, costMatrix);
+
+            // 3. Zapisz różnicę kosztów
+            sumDelta += Math.abs(cost2 - cost1);
+        }
+
+        //  ΔE
+        double avgDelta = sumDelta / sampleSize;
+
+        //  =>  T0 = -ΔE / ln(p0)
+        double T0 = -avgDelta / Math.log(acceptanceProbability);
+        return T0;
+    }
+
+    public static double routeCost(int[] route, int[][] costMatrix) {
+        double totalCost = 0.0;
+        for (int i = 0; i < route.length - 1; i++) {
+            totalCost += costMatrix[route[i]][route[i + 1]];
+        }
+        // Powrót do miasta startowego
+        totalCost += costMatrix[route[route.length - 1]][route[0]];
+        return totalCost;
+    }
+
+
+    public static int[] generateRandomRoute(int n, Random rand) {
+        int[] route = new int[n];
+        // Inicjalizacja tablicy sekwencją [0, 1, 2, ..., n-1]
+        for (int i = 0; i < n; i++) {
+            route[i] = i;
+        }
+        // Prosty algorytm Fisher-Yates do tasowania
+        for (int i = n - 1; i > 0; i--) {
+            int j = rand.nextInt(i + 1);
+            // Zamiana
+            int temp = route[i];
+            route[i] = route[j];
+            route[j] = temp;
+        }
+        return route;
+    }
+
+
+    public static void swapTwoCities(int[] route, Random rand) {
+        int n = route.length;
+        int i = rand.nextInt(n);
+        int j = rand.nextInt(n);
+        // Zamieniamy w tablicy miejscami
+        int temp = route[i];
+        route[i] = route[j];
+        route[j] = temp;
+    }
 }
+
