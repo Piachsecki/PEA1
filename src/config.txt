@@ -1,4 +1,5 @@
 mode:test
-filepath:./src/resources/ftv47.atsp
+filepath:./src/resources/ftv170.atsp
 stopTime:1
 coolingRate:0.99
+optimalCost:1776

@@ -9,6 +9,11 @@ public class ConfigurationMapper {
     private String filepath;
     private long stopTime;
     private double coolingRate;
+    private int optimalCost;
+
+    public int getOptimalCost() {
+        return optimalCost;
+    }
 
     public ConfigurationMapper(String url) throws IOException {
         try (BufferedReader br = new BufferedReader(new FileReader(url))) {
@@ -31,6 +36,9 @@ public class ConfigurationMapper {
                         break;
                     case "coolingRate":
                         this.coolingRate = Double.parseDouble(value);
+                        break;
+                    case "optimalCost":
+                        this.optimalCost = Integer.parseInt(value);
                         break;
                     default:
                         throw new IllegalArgumentException("Nieznany klucz w konfiguracji: " + key);

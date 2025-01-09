@@ -74,16 +74,4 @@ public class DataParser {
     public int getDimension() {
         return dimension;
     }
-
-    public static void main(String[] args) {
-        try {
-            DataParser parser = new DataParser();
-            parser.parseFile("./src/resources/ftv47.atsp");
-
-            int[][] matrix = parser.getDistanceMatrix();
-            System.out.println("Parsed matrix with dimension: " + parser.getDimension());
-        } catch (IOException e) {
-            System.err.println("Error reading file: " + e.getMessage());
-        }
-    }
 }
